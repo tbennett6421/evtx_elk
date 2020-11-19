@@ -1,0 +1,12 @@
+services:
+  elk:
+    image: sebp/elk
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+      - "30000:30000"
+    environment:
+      - MAX_MAP_COUNT=262144
+    volumes:
+      - './files/logstash-input.local.conf:/etc/logstash/conf.d/03-input.conf'
