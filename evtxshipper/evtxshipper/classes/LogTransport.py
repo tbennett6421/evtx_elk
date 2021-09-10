@@ -1,3 +1,16 @@
+import contextlib
+import mmap
+import traceback
+import json
+from collections import OrderedDict
+from datetime import datetime
+
+from Evtx.Evtx import FileHeader
+from Evtx.Views import evtx_file_xml_view
+from elasticsearch import Elasticsearch, helpers
+import xmltodict
+import sys
+
 class EvtxToElk:
     @staticmethod
     def bulk_to_elasticsearch(es, bulk_queue):
