@@ -9,5 +9,13 @@
 3. Launch the services
     ```sh
     # Launch docker-compose
-    sudo docker-compose up elk
+    docker-compose up elk
+
+    # Build a new image on changes
+    docker-compose build elk
+
+    # Force the container to be recreated from image
+    docker-compose up elk --force-recreate
+
+
     ```

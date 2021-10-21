@@ -2,11 +2,20 @@ services:
   elk:
     image: sebp/elk
     ports:
-      - "5601:5601"
       - "9200:9200"
-      - "5044:5044"
-      - "30000:30000"
+      - 127.0.0.1:9600:9600                 # Bind LS API locally
+      - 127.0.0.1:5601:5601                 # Bind Kibana interface locally
+      - "5044:5044"                         # Listen for beats events
+      - "30000:30000"                       # Listen for HTTP events
+    volumes:
+      - './files/:/etc/logstash/conf.d/'    # Map conf files to conf.d pipeline
+      - './data/:/data'                     # Map targetted data to a directory in the container
+    build:
+      dockerfile: Dockerfile
     environment:
       - MAX_MAP_COUNT=262144
-    volumes:
-      - './files/logstash-input.local.conf:/etc/logstash/conf.d/03-input.conf'
+      - NO_PROXY="localhost, 127.0.0.1/8,"
+      - SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
+      - CURL_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
+      - REQUESTS_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
+      - AWS_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
