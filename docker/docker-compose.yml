@@ -2,8 +2,8 @@ services:
   elk:
     image: sebp/elk
     ports:
-      - "9200:9200"
       - 127.0.0.1:9600:9600                 # Bind LS API locally
+      - 127.0.0.1:9200:9200                 # Bind ES REST API locally
       - 127.0.0.1:5601:5601                 # Bind Kibana interface locally
       - "5044:5044"                         # Listen for beats events
       - "30000:30000"                       # Listen for HTTP events
@@ -13,7 +13,6 @@ services:
     build:
       dockerfile: Dockerfile
     environment:
-      - MAX_MAP_COUNT=262144
       - HTTP_PROXY="http://proxy.example.com:8080"
       - HTTPS_PROXY="http://proxy.example.com:8080"
       - NO_PROXY="localhost, 127.0.0.1/8,"

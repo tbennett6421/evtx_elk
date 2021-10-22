@@ -8,6 +8,10 @@ ENV CURL_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
 ENV REQUESTS_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
 ENV AWS_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
 
+###################################
+### System modifications
+###################################
+
 # Copy enterprise ca's to ca-certificates locally
 COPY ./certs/example-policy.crt /usr/local/share/ca-certificates/example-policy.crt
 COPY ./certs/example-root.crt /usr/local/share/ca-certificates/example-root.crt
@@ -15,6 +19,23 @@ COPY ./certs/example-enterprise-issuing.crt /usr/local/share/ca-certificates/exa
 
 # Add to System CA trust
 RUN update-ca-certificates -v -f
+
+###################################
+### Elasticsearch modifications
+###################################
+
+# Delete certs and supress failures
+RUN keytool -delete -alias ex_root_cert -keystore /opt/elasticsearch/jdk/lib/security/cacerts -storepass changeit > /dev/null 2>&1 || return 0
+RUN keytool -delete -alias ex_pol_cert -keystore /opt/elasticsearch/jdk/lib/security/cacerts -storepass changeit > /dev/null 2>&1 || return 0
+RUN keytool -delete -alias ex_ei_cert -keystore /opt/elasticsearch/jdk/lib/security/cacerts -storepass changeit > /dev/null 2>&1 || return 0
+# Add certs to keystore
+RUN keytool -import -trustcacerts -keystore /opt/elasticsearch/jdk/lib/security/cacerts -storepass changeit -noprompt -alias ex_root_cert -file /usr/local/share/ca-certificates/example-root.crt
+RUN keytool -import -trustcacerts -keystore /opt/elasticsearch/jdk/lib/security/cacerts -storepass changeit -noprompt -alias ex_pol_cert -file /usr/local/share/ca-certificates/example-policy.crt
+RUN keytool -import -trustcacerts -keystore /opt/elasticsearch/jdk/lib/security/cacerts -storepass changeit -noprompt -alias ex_ei_cert -file /usr/local/share/ca-certificates/example-enterprise-issuing.crt
+
+###################################
+### Logstash modifications
+###################################
 
 # Delete certs and supress failures
 RUN keytool -delete -alias ex_root_cert -keystore /opt/logstash/jdk/lib/security/cacerts -storepass changeit > /dev/null 2>&1 || return 0
