@@ -46,6 +46,11 @@ RUN keytool -import -trustcacerts -keystore /opt/logstash/jdk/lib/security/cacer
 RUN keytool -import -trustcacerts -keystore /opt/logstash/jdk/lib/security/cacerts -storepass changeit -noprompt -alias ex_pol_cert -file /usr/local/share/ca-certificates/example-policy.crt
 RUN keytool -import -trustcacerts -keystore /opt/logstash/jdk/lib/security/cacerts -storepass changeit -noprompt -alias ex_ei_cert -file /usr/local/share/ca-certificates/example-enterprise-issuing.crt
 
+# Add minor changes to Logstash config to allow localhost->localhost comms
+# Bind to all interfaces, then restrict localhost via the docker-compose ports
+RUN   sed -i "s|# http.host: 127.0.0.1|http.host: 0.0.0.0|g" /opt/logstash/config/logstash.yml
+RUN   sed -i "s|# http.port: 9600-9700|http.port: 9600|g" /opt/logstash/config/logstash.yml
+
 WORKDIR ${LOGSTASH_HOME}
 RUN gosu logstash /opt/logstash/bin/logstash-plugin install logstash-filter-csv
 RUN gosu logstash /opt/logstash/bin/logstash-plugin install logstash-codec-csv
