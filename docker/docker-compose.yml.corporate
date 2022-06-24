@@ -11,4 +11,12 @@ services:
       - './files/:/etc/logstash/conf.d/'    # Map conf files to conf.d pipeline
       - './data/:/data'                     # Map targetted data to a directory in the container
     build:
-      dockerfile: Dockerfile.home
+      dockerfile: Dockerfile.corporate
+    environment:
+      - HTTP_PROXY="http://proxy.example.com:8080"
+      - HTTPS_PROXY="http://proxy.example.com:8080"
+      - NO_PROXY="localhost, 127.0.0.1/8,"
+      - SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
+      - CURL_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
+      - REQUESTS_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
+      - AWS_CA_BUNDLE="/etc/ssl/certs/ca-certificates.crt"
